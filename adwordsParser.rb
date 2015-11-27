@@ -112,7 +112,7 @@ class AdwordsParser
         @ads[row['Ad Group']] = []
       end
       #Add select components of text ads to the array, then add the array to the @ads hash
-      if !(row['Headline'].nil?)
+      if !(row['Headline'].nil?) & !(row['Display URL'].nil?) & !(row['Description Line 1'].nil?) & !(row['Description Line 2'].nil?) & !(row['Final URL'].nil?)
         ad << row['Headline']
         ad << row['Display URL']
         ad << row['Description Line 1']
@@ -130,9 +130,12 @@ class AdwordsParser
         @kws[row['Ad Group']] = []
       end
       #Add select components of keywords to the array, then add the array to the @kws hash
-      if !(row['Keyword'].nil?)
+      if !(row['Keyword'].nil?) & !(row['Criterion Type'].nil?) & !(row['Max CPC'].nil?)
         kwData << row['Keyword']
         kwData << row['Criterion Type']
+        if (row['Max CPC'].nil?)
+          kwData << "0"
+        end
         kwData << row['Max CPC']
         @kws[row['Ad Group']] << kwData
       end
