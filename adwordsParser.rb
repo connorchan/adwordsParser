@@ -65,6 +65,7 @@ class AdwordsParser
   
   def getCampaignData
     adwords = CSV.foreach("#{@filename}", headers:true) do |row|
+      #Get the first data row for each campaign in the CSV
       if !(row['Campaign Type'].nil?)
         @campData[row['Campaign']] = row
       end
@@ -74,6 +75,7 @@ class AdwordsParser
   def getAdGroups
     adwords = CSV.foreach("#{@filename}", headers:true) do |row|
       adGroup = row['Ad Group']
+      #If Ad Group hasn't been collected yet, add it to the array
       if (@adGroups.include? adGroup) || (adGroup.nil?)
         next
       else
@@ -84,6 +86,7 @@ class AdwordsParser
   
   def getAdGroupData
     adwords = CSV.foreach("#{@filename}", headers:true) do |row|
+      #Get the first data row for each Ad Group in the CSV
       if !(row['Ad Group Type'].nil?)
         @agData[row['Ad Group']] = row
       end
@@ -95,6 +98,7 @@ class AdwordsParser
       if (@agMap[row['Campaign']].nil?)
         @agMap[row['Campaign']] = []
       end
+      #for @agMap hash: Key = Campaign, Value = Ad Group
       if !(@agMap[row['Campaign']].include? row['Ad Group']) & !(row['Ad Group'].nil?)
         @agMap[row['Campaign']] << row['Ad Group']
       end
@@ -107,6 +111,7 @@ class AdwordsParser
       if (@ads[row['Ad Group']].nil?)
         @ads[row['Ad Group']] = []
       end
+      #Add select components of text ads to the array, then add the array to the @ads hash
       if !(row['Headline'].nil?)
         ad << row['Headline']
         ad << row['Display URL']
@@ -124,6 +129,7 @@ class AdwordsParser
       if (@kws[row['Ad Group']].nil?)
         @kws[row['Ad Group']] = []
       end
+      #Add select components of keywords to the array, then add the array to the @kws hash
       if !(row['Keyword'].nil?)
         kwData << row['Keyword']
         kwData << row['Criterion Type']
