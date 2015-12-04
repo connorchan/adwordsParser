@@ -1,4 +1,5 @@
 require 'csv'
+require 'open-uri'
 class AdwordsParser
   
   def initialize(filename)
@@ -9,6 +10,7 @@ class AdwordsParser
     @agMap = {}
     @ads = {}
     @kws = {}
+    @negs = {}
     @filename = filename
   end
   
@@ -40,6 +42,10 @@ class AdwordsParser
     @kws
   end
   
+  def negs
+    @negs
+  end
+  
   def parseCampaigns
     self.getCampaigns()
     self.getCampaignData()
@@ -48,6 +54,7 @@ class AdwordsParser
     self.mapAdGroups()
     self.getAds()
     self.getKeywords()
+    self.getNegatives()
   end
   
   def getCampaigns
@@ -130,14 +137,29 @@ class AdwordsParser
         @kws[row['Ad Group']] = []
       end
       #Add select components of keywords to the array, then add the array to the @kws hash
-      if !(row['Keyword'].nil?) & !(row['Criterion Type'].nil?)
+      if !(row['Keyword'].nil?) & !(row['Criterion Type'].nil?) & !(row['Criterion Type'].to_s.include? "Negative")
         kwData << row['Keyword']
         kwData << row['Criterion Type']
         if (row['Max CPC'].nil?)
           kwData << "0"
+        else
+          kwData << row['Max CPC']
         end
-        kwData << row['Max CPC']
         @kws[row['Ad Group']] << kwData
+      end
+    end
+  end
+  
+  def getNegatives
+    adwords = CSV.foreach("#{@filename}", headers:true) do |row|
+      negData = []
+      if (@negs[row['Ad Group']].nil?)
+        @negs[row['Ad Group']] = []
+      end
+      if !(row['Keyword'].nil?) & !(row['Criterion Type'].nil?) & (row['Criterion Type'].to_s.include? "Negative")
+        negData << row['Keyword']
+        negData << row['Criterion Type']
+        @negs[row['Ad Group']] << negData
       end
     end
   end
@@ -165,6 +187,10 @@ def main
         puts tst.kws[adgroup][m][0]
         puts tst.kws[adgroup][m][1]
         puts tst.kws[adgroup][m][2]
+      end
+      for n in 0...tst.negs[adgroup].length
+        puts tst.negs[adgroup][n][0]
+        puts tst.negs[adgroup][n][1]
       end
     end
   end
